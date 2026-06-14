@@ -4,17 +4,23 @@
 
 	let { data, children }: { data: LayoutData; children: any } = $props();
 
-	const navItems = [
-		{ href: '/dashboard/salon',            label: 'Przegląd',    icon: '◉' },
-		{ href: '/dashboard/salon/uslugi',      label: 'Usługi',      icon: '✦' },
-		{ href: '/dashboard/salon/pracownicy',  label: 'Pracownicy',  icon: '◈' },
-		{ href: '/dashboard/salon/kalendarz',   label: 'Kalendarz',   icon: '▦' },
-		{ href: '/dashboard/salon/opinie',      label: 'Opinie',      icon: '★' },
-		{ href: '/dashboard/salon/promocje',    label: 'Promocje',    icon: '⊕' },
-		{ href: '/dashboard/salon/ustawienia',  label: 'Ustawienia',  icon: '⚙' },
-	];
+	const salonId = $derived($page.params.id ?? null);
 
-	const isActive = (href: string) => $page.url.pathname === href;
+	const salonNav = $derived(
+		salonId
+			? [
+					{ href: `/dashboard/salon/${salonId}/edytuj`,      label: 'Profil',       icon: '◉' },
+					{ href: `/dashboard/salon/${salonId}/uslugi`,      label: 'Usługi',       icon: '✦' },
+					{ href: `/dashboard/salon/${salonId}/pracownicy`,  label: 'Pracownicy',   icon: '◈' },
+					{ href: `/dashboard/salon/${salonId}/kalendarz`,   label: 'Kalendarz',    icon: '▦' },
+					{ href: `/dashboard/salon/${salonId}/opinie`,      label: 'Opinie',       icon: '★' },
+					{ href: `/dashboard/salon/${salonId}/promocje`,    label: 'Promocje',     icon: '⊕' },
+					{ href: `/dashboard/salon/${salonId}/ustawienia`,  label: 'Ustawienia',   icon: '⚙' },
+			  ]
+			: []
+	);
+
+	const isActive = (href: string) => $page.url.pathname.startsWith(href);
 
 	async function signOut() {
 		await data.supabase.auth.signOut();
@@ -31,17 +37,34 @@
 		</div>
 
 		<nav class="sidebar-nav">
-			{#each navItems as item}
-				<a
-					href={item.href}
-					class="nav-item"
-					class:active={isActive(item.href)}
-					aria-current={isActive(item.href) ? 'page' : undefined}
-				>
-					<span class="nav-icon" aria-hidden="true">{item.icon}</span>
-					{item.label}
+			{#if salonId}
+				<a href="/dashboard/salon" class="nav-item back-link">
+					<span class="nav-icon" aria-hidden="true">←</span>
+					Moje salony
 				</a>
-			{/each}
+				<div class="nav-divider"></div>
+				{#each salonNav as item}
+					<a
+						href={item.href}
+						class="nav-item"
+						class:active={isActive(item.href)}
+						aria-current={isActive(item.href) ? 'page' : undefined}
+					>
+						<span class="nav-icon" aria-hidden="true">{item.icon}</span>
+						{item.label}
+					</a>
+				{/each}
+			{:else}
+				<a
+					href="/dashboard/salon"
+					class="nav-item"
+					class:active={$page.url.pathname === '/dashboard/salon' || $page.url.pathname === '/dashboard/salon/nowy'}
+					aria-current={$page.url.pathname === '/dashboard/salon' ? 'page' : undefined}
+				>
+					<span class="nav-icon" aria-hidden="true">◉</span>
+					Moje salony
+				</a>
+			{/if}
 		</nav>
 
 		<div class="sidebar-bottom">
@@ -128,6 +151,15 @@
 
 .nav-item:hover { background: var(--c-surface-2); color: var(--c-charcoal); }
 .nav-item.active { background: var(--c-rose-light); color: var(--c-rose-dark); }
+
+.back-link { font-size: 0.8rem; opacity: 0.75; }
+.back-link:hover { opacity: 1; }
+
+.nav-divider {
+	height: 1px;
+	background: var(--c-border);
+	margin: var(--space-2) var(--space-3);
+}
 
 .nav-icon {
 	font-size: 0.875rem;
