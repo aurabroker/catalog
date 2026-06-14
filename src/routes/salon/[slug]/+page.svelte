@@ -4,7 +4,14 @@
 	import { DAY_NAMES_FULL } from '$lib/types';
 
 	let { data }: { data: PageData } = $props();
-	const { salon, services, reviews, staff, hours, promotions, avgRating } = data;
+
+	const salon      = $derived(data.salon);
+	const services   = $derived(data.services);
+	const reviews    = $derived(data.reviews);
+	const staff      = $derived(data.staff);
+	const hours      = $derived(data.hours);
+	const promotions = $derived(data.promotions);
+	const avgRating  = $derived(data.avgRating);
 
 	let activeTab = $state<'oferta' | 'pracownicy' | 'opinie' | 'galeria'>('oferta');
 
@@ -353,6 +360,7 @@
 				<div class="sidebar-card">
 					<h2 class="display-sm" style="margin-bottom:1rem">Godziny otwarcia</h2>
 					<table class="hours-table">
+						<tbody>
 						{#each hours as h}
 							<tr class:today={new Date().getDay() === (h.day_of_week % 7)}>
 								<td class="day-name">{DAY_NAMES_FULL[h.day_of_week]}</td>
@@ -365,6 +373,7 @@
 								</td>
 							</tr>
 						{/each}
+						</tbody>
 					</table>
 				</div>
 			{/if}

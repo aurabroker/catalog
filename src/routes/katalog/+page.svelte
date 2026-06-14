@@ -10,6 +10,11 @@
 	let q    = $state(data.filters.q);
 	let city = $state(data.filters.city);
 
+	$effect.pre(() => {
+		q    = data.filters.q;
+		city = data.filters.city;
+	});
+
 	const plans = [
 		{ value: '',            label: 'Wszystkie' },
 		{ value: 'premium_plus', label: 'Premium+' },
