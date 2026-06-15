@@ -3,11 +3,18 @@ import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = async ({ url, locals }) => {
 	const code = url.searchParams.get('code');
-	const next = url.searchParams.get('next') ?? '/dashboard/salon';
+	const error = url.searchParams.get('error');
 
-	if (code) {
-		await locals.supabase.auth.exchangeCodeForSession(code);
+	if (error) {
+		redirect(303, `/auth/login?error=${encodeURIComponent(error)}`);
 	}
 
-	redirect(303, next);
+	if (code) {
+		const { error: exchangeError } = await locals.supabase.auth.exchangeCodeForSession(code);
+		if (exchangeError) {
+			redirect(303, `/auth/login?error=${encodeURIComponent(exchangeError.message)}`);
+		}
+	}
+
+	redirect(303, '/dashboard/salon');
 };

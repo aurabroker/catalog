@@ -5,16 +5,15 @@
 	let { data }: { data: PageData } = $props();
 
 	let loading = $state(false);
-	let error   = $state<string | null>(null);
+	let error   = $state<string | null>($page.url.searchParams.get('error'));
 
 	async function signInWithGoogle() {
 		loading = true;
 		error = null;
-		const redirectTo = $page.url.searchParams.get('next') ?? '/dashboard/salon';
 		const { error: err } = await data.supabase.auth.signInWithOAuth({
 			provider: 'google',
 			options: {
-				redirectTo: `${$page.url.origin}/auth/callback?next=${encodeURIComponent(redirectTo)}`
+				redirectTo: `${$page.url.origin}/auth/callback`
 			}
 		});
 		if (err) {
